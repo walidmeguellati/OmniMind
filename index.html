@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniMind — Enterprise Intelligence Platform</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+        cairo: ['Cairo', 'sans-serif'],
+      },
+      colors: {
+        omni: {
+          50: '#eef5ff',
+          100: '#d9e8ff',
+          200: '#bcd8ff',
+          300: '#8ec0ff',
+          400: '#599eff',
+          500: '#3478fc',
+          600: '#1e59f1',
+          700: '#1745de',
+          800: '#1938b4',
+          900: '#1a338e',
+          950: '#152156',
+        },
+        glass: {
+          light: 'rgba(255,255,255,0.08)',
+          medium: 'rgba(255,255,255,0.12)',
+          heavy: 'rgba(255,255,255,0.18)',
+        }
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'slide-down': 'slideDown 0.4s ease-out',
+        'fade-in': 'fadeIn 0.6s ease-out',
+        'scale-in': 'scaleIn 0.3s ease-out',
+        'shimmer': 'shimmer 2s linear infinite',
+        'typewriter': 'typewriter 0.05s steps(1) infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        glow: {
+          '0%': { boxShadow: '0 0 20px rgba(52,120,252,0.3)' },
+          '100%': { boxShadow: '0 0 40px rgba(52,120,252,0.6)' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideDown: {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.9)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+      },
+    }
+  }
+}
+</script>
+<style>
+  :root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #0f1629;
+    --bg-card: rgba(15, 22, 41, 0.7);
+    --glass-border: rgba(255,255,255,0.08);
+    --accent: #3478fc;
+    --accent-glow: rgba(52,120,252,0.3);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: #e2e8f0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
+
+  /* === Scrollbar === */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(15,22,41,0.5); }
+  ::-webkit-scrollbar-thumb { background: rgba(52,120,252,0.4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(52,120,252,0.6); }
+
+  /* === Background Mesh === */
+  .bg-mesh {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(52,120,252,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 50% 50%, rgba(16,185,129,0.04) 0%, transparent 50%);
+  }
+
+  /* === Glass Card === */
+  .glass-card {
+    background: rgba(15, 22, 41, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+  }
+  .glass-card:hover {
+    border-color: rgba(52,120,252,0.2);
+    box-shadow: 0 8px 32px rgba(52,120,252,0.08);
+  }
+
+  .glass-card-strong {
+    background: rgba(15, 22, 41, 0.75);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+  }
+
+  /* === Metric Card Gradient Borders === */
+  .metric-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(52,120,252,0.3), rgba(139,92,246,0.1), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* === Command Input === */
+  .command-input {
+    background: rgba(15, 22, 41, 0.8);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    caret-color: #3478fc;
+  }
+  .command-input:focus {
+    outline: none;
+    border-color: rgba(52,120,252,0.5);
+    box-shadow: 0 0 0 4px rgba(52,120,252,0.1), 0 8px 32px rgba(52,120,252,0.1);
+  }
+
+  /* === Table === */
+  .data-table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  .data-table thead th {
+    background: rgba(52,120,252,0.08);
+    padding: 14px 18px;
+    text-align: start;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .data-table thead th:first-child { border-radius: 12px 0 0 0; }
+  html[dir="rtl"] .data-table thead th:first-child { border-radius: 0 12px 0 0; }
+  .data-table thead th:last-child { border-radius: 0 12px 0 0; }
+  html[dir="rtl"] .data-table thead th:last-child { border-radius: 12px 0 0 0; }
+  .data-table tbody tr {
+    transition: all 0.2s ease;
+  }
+  .data-table tbody tr:hover {
+    background: rgba(52,120,252,0.04);
+  }
+  .data-table tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.9rem;
+  }
+
+  /* === Status Badges === */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-active { background: rgba(16,185,129,0.12); color: #34d399; }
+  .badge-away { background: rgba(245,158,11,0.12); color: #fbbf24; }
+  .badge-offline { background: rgba(239,68,68,0.12); color: #f87171; }
+  .badge-onleave { background: rgba(139,92,246,0.12); color: #a78bfa; }
+
+  /* === Shimmer Loading === */
+  .shimmer-bg {
+    background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.04) 50%, transparent 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* === AI Processing Indicator === */
+  .ai-processing {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-processing .dot {
+    width: 6px; height: 6px;
+    background: #3478fc;
+    border-radius: 50%;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .ai-processing .dot:nth-child(2) { animation-delay: 0.2s; }
+  .ai-processing .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* === Toast Notification === */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  html[dir="rtl"] .toast-container { right: auto; left: 20px; }
+  .toast {
+    padding: 14px 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    animation: slideDown 0.4s ease-out;
+    max-width: 400px;
+    font-size: 0.875rem;
+  }
+  .toast-success { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); }
+  .toast-info { background: rgba(52,120,252,0.15); border-color: rgba(52,120,252,0.3); }
+  .toast-warning { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.3); }
+
+  /* === Navbar blur === */
+  .navbar-glass {
+    background: rgba(10, 14, 26, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* === Mobile menu === */
+  .mobile-menu {
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  html[dir="rtl"] .mobile-menu {
+    transform: translateX(-100%);
+  }
+  .mobile-menu.open {
+    transform: translateX(0);
+  }
+
+  /* === Floating Orbs === */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* === Log Entry === */
+  .log-entry {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  /* === Print === */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff; color: #000; }
+    .glass-card, .glass-card-strong { background: #f8f9fa; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body class="font-inter">
+
+<!-- Background Mesh -->
+<div class="bg-mesh"></div>
+
+<!-- Floating Orbs -->
+<div class="orb" style="width:400px;height:400px;background:#3478fc;top:-100px;left:-100px;animation-delay:0s;"></div>
+<div class="orb" style="width:300px;height:300px;background:#8b5cf6;bottom:-50px;right:-80px;animation-delay:2s;"></div>
+<div class="orb" style="width:250px;height:250px;background:#10b981;top:50%;left:60%;animation-delay:4s;"></div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- ======================== NAVBAR ======================== -->
+<nav class="navbar-glass fixed top-0 inset-x-0 z-50 no-print">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 sm:h-18">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="relative w-10 h-10 flex items-center justify-center">
+          <div class="absolute inset-0 bg-gradient-to-br from-omni-500 to-purple-600 rounded-xl rotate-6 opacity-80"></div>
+          <div class="relative z-10 text-white font-black text-lg">Ω</div>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-omni-300 bg-clip-text text-transparent leading-tight">OmniMind</h1>
+          <p class="text-[10px] text-slate-500 font-medium tracking-widest uppercase" id="navSubtitle">Enterprise Intelligence</p>
+        </div>
+      </div>
+
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center gap-6">
+        <!-- Server Status -->
+        <div class="flex items-center gap-2 glass-card px-4 py-2 text-xs">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-emerald-400 font-medium" id="serverStatusText">Private Server Connected</span>
+        </div>
+
+        <!-- Language Toggle -->
+        <button onclick="toggleLanguage()" class="glass-card px-4 py-2 text-xs font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2" title="Toggle Arabic/English">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+          <span id="langToggleLabel">عربي</span>
+        </button>
+
+        <!-- Time -->
+        <div class="text-xs text-slate-400 font-mono" id="liveTime"></div>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button onclick="toggleMobileMenu()" class="md:hidden glass-card p-2 text-slate-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menuIcon">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Panel -->
+  <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 bg-[#0f1629]/95 backdrop-blur-xl z-50 md:hidden p-6 border-l border-white/5">
+    <button onclick="toggleMobileMenu()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div class="mt-12 space-y-6">
+      <div class="flex items-center gap-2 text-sm">
+        <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+        <span class="text-emerald-400 font-medium" id="mobileServerStatus">Private Server Connected</span>
+      </div>
+      <button onclick="toggleLanguage(); toggleMobileMenu();" class="w-full text-left glass-card px-4 py-3 text-sm text-slate-300 hover:text-white">Toggle Language</button>
+      <div class="text-xs text-slate-500 font-mono" id="mobileTime"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ======================== MAIN CONTENT ======================== -->
+<main class="relative z-10 pt-24 sm:pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto">
+
+  <!-- ====== SECTION 1: COMMAND & METRICS HUB ====== -->
+  <section class="mb-10 animate-fade-in">
+    <!-- Section Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 glass-card px-4 py-1.5 text-xs text-omni-400 font-semibold mb-4 tracking-wider uppercase">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span id="sectionLabel1">OmniMind AI Core</span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-omni-200 to-omni-400 bg-clip-text text-transparent mb-3" id="heroTitle">
+        Command Your Enterprise
+      </h2>
+      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto" id="heroSubtitle">
+        Type natural language commands to manage employees, generate reports, and orchestrate your corporate intelligence in real-time.
+      </p>
+    </div>
+
+    <!-- Command Box -->
+    <div class="glass-card-strong p-4 sm:p-6 mb-8 max-w-4xl mx-auto">
+      <div class="flex items-start gap-3">
+        <div class="hidden sm:flex w-10 h-10 rounded-xl bg-gradient-to-br from-omni-500 to-purple-600 items-center justify-center flex-shrink-0 mt-1">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </div>
+        <div class="flex-1">
+          <label class="block text-xs text-slate-500 mb-2 font-medium tracking-wider uppercase" id="commandLabel">OmniMind Command Prompt</label>
+          <div class="relative">
+            <textarea id="commandInput" rows="2"
+              class="command-input w-full px-4 py-3 text-sm sm:text-base text-white placeholder-slate-500 resize-none"
+              placeholder="e.g. Add 3 software engineers to tech department..."
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();processCommand()}"></textarea>
+            <button onclick="processCommand()" id="cmdSendBtn"
+              class="absolute bottom-3 right-3 bg-gradient-to-r from-omni-500 to-omni-600 hover:from-omni-400 hover:to-omni-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-omni-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span id="cmdBtnText">Execute</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Response Log -->
+      <div id="aiResponseArea" class="mt-4 hidden">
+        <div class="border-t border-white/5 pt-4">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-6 h-6 rounded-lg bg-omni-500/20 flex items-center justify-center">
+              <span class="text-omni-400 text-xs font-bold">Ω</span>
+            </div>
+            <span class="text-xs font-semibold text-omni-400" id="aiResponseLabel">OmniMind Response</span>
+          </div>
+          <div id="aiResponseLog" class="space-y-2 max-h-48 overflow-y-auto text-sm text-slate-300 pr-2"></div>
+        </div>
+      </div>
+
+      <!-- Quick Commands -->
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="text-xs text-slate-500 self-center" id="quickLabel">Quick:</span>
+        <button onclick="quickCommand('Add 3 software engineers to tech department')" class="text-xs glass-card px-3 py-1.5 text-slate-400 hover:text-omni-400 transition-colors">+ Add Engineers</button>
+        <button onclick="quickCommand('Generate salary statistics report')" class="text-xs glass-card px-3 py-1.5 text-slate-400 hover:text-omni-400 transition-colors">📊 Salary Report</button>
+        <button onclick="quickCommand('Sort employees alphabetically by department')" class="text-xs glass-card px-3 py-1.5 text-slate-400 hover:text-omni-400 transition-colors">🔤 Sort A-Z</button>
+        <button onclick="quickCommand('Show all active employees')" class="text-xs glass-card px-3 py-1.5 text-slate-400 hover:text-omni-400 transition-colors">👥 Active Staff</button>
+        <button onclick="quickCommand('Add marketing department with 2 managers')" class="text-xs glass-card px-3 py-1.5 text-slate-400 hover:text-omni-400 transition-colors">🏢 New Dept</button>
+      </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" id="metricsGrid">
+      <!-- Card 1: Total Employees -->
+      <div class="glass-card metric-card p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-omni-500/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-omni-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <span class="text-xs text-emerald-400 font-semibold bg-emerald-400/10 px-2 py-1 rounded-lg" id="empChangeIndicator">+0%</span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold text-white mb-1" id="metricTotalEmp">0</p>
+        <p class="text-xs sm:text-sm text-slate-400" id="metricTotalLabel">Total Employees</p>
+      </div>
+
+      <!-- Card 2: Departments -->
+      <div class="glass-card metric-card p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <span class="text-xs text-purple-400 font-semibold bg-purple-400/10 px-2 py-1 rounded-lg" id="deptChangeIndicator">Active</span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold text-white mb-1" id="metricDepts">0</p>
+        <p class="text-xs sm:text-sm text-slate-400" id="metricDeptLabel">Departments</p>
+      </div>
+
+      <!-- Card 3: Active Rate -->
+      <div class="glass-card metric-card p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <span class="text-xs text-emerald-400 font-semibold bg-emerald-400/10 px-2 py-1 rounded-lg">Live</span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold text-white mb-1" id="metricActiveRate">0%</p>
+        <p class="text-xs sm:text-sm text-slate-400" id="metricActiveLabel">Active Rate</p>
+      </div>
+
+      <!-- Card 4: Avg Salary -->
+      <div class="glass-card metric-card p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <span class="text-xs text-amber-400 font-semibold bg-amber-400/10 px-2 py-1 rounded-lg" id="salaryIndicator">USD</span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold text-white mb-1" id="metricAvgSalary">$0</p>
+        <p class="text-xs sm:text-sm text-slate-400" id="metricSalaryLabel">Avg. Salary</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SECTION 2: EMPLOYEE DIRECTORY ====== -->
+  <section class="mb-10 animate-fade-in" style="animation-delay:0.2s">
+    <div class="glass-card-strong overflow-hidden">
+      <!-- Table Header -->
+      <div class="p-5 sm:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2" id="directoryTitle">
+            <svg class="w-5 h-5 text-omni-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+            Live Employee Directory
+          </h3>
+          <p class="text-xs text-slate-500 mt-1" id="directorySubtitle">Real-time corporate network registry managed by OmniMind</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="searchInput" oninput="filterTable()"
+              class="command-input pl-10 pr-4 py-2 text-sm w-48 sm:w-56" placeholder="Search employees...">
+          </div>
+          <select id="filterDept" onchange="filterTable()" class="command-input px-3 py-2 text-sm text-slate-300 w-40">
+            <option value="">All Departments</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="data-table" id="employeeTable">
+          <thead>
+            <tr>
+              <th id="thId">ID</th>
+              <th id="thName">Employee Name</th>
+              <th id="thDept">Department</th>
+              <th id="thTitle">Title</th>
+              <th id="thSalary">Salary</th>
+              <th id="thStatus">Status</th>
+              <th id="thJoined">Joined</th>
+            </tr>
+          </thead>
+          <tbody id="employeeTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer -->
+      <div class="p-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span id="tableFooterInfo">Showing 0 of 0 employees</span>
+        <div class="flex items-center gap-2">
+          <button onclick="prevPage()" class="glass-card px-3 py-1.5 hover:text-white transition-colors" id="prevBtn">← Prev</button>
+          <span id="pageInfo" class="px-2">Page 1</span>
+          <button onclick="nextPage()" class="glass-card px-3 py-1.5 hover:text-white transition-colors" id="nextBtn">Next →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SECTION 3: COMPANY INTELLIGENCE HUB ====== -->
+  <section class="mb-10 animate-fade-in" style="animation-delay:0.4s">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 glass-card px-4 py-1.5 text-xs text-purple-400 font-semibold mb-4 tracking-wider uppercase">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span id="sectionLabel3">Company Intelligence Hub</span>
+      </div>
+      <h3 class="text-xl sm:text-2xl font-bold text-white mb-2" id="intelTitle">Corporate Intelligence & Governance</h3>
+      <p class="text-sm text-slate-400" id="intelSubtitle">Vision, departments, and policies orchestrated by OmniMind Core</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Vision Card -->
+      <div class="glass-card p-6 lg:col-span-1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-omni-500 to-cyan-500 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </div>
+          <div>
+            <h4 class="text-white font-bold" id="visionCardTitle">Company Vision</h4>
+            <p class="text-xs text-slate-500" id="visionCardSub">Strategic Direction</p>
+          </div>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed" id="visionText">
+          To empower enterprises with AI-driven intelligence, transforming how organizations manage human capital, make strategic decisions, and achieve operational excellence through the OmniMind platform.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <span class="text-xs bg-omni-500/10 text-omni-400 px-2.5 py-1 rounded-lg">AI-First</span>
+          <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg">Innovation</span>
+          <span class="text-xs bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-lg">Security</span>
+        </div>
+      </div>
+
+      <!-- Department Overview Card -->
+      <div class="glass-card p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <div>
+            <h4 class="text-white font-bold" id="deptCardTitle">Departments</h4>
+            <p class="text-xs text-slate-500" id="deptCardSub">Organizational Structure</p>
+          </div>
+        </div>
+        <div id="departmentList" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Policies Card -->
+      <div class="glass-card p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <div>
+            <h4 class="text-white font-bold" id="policyCardTitle">Work Policies</h4>
+            <p class="text-xs text-slate-500" id="policyCardSub">Governance Framework</p>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03]">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-white font-medium" id="policy1Title">Hybrid Work Model</p>
+              <p class="text-xs text-slate-500" id="policy1Desc">Flexible remote and on-site scheduling</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03]">
+            <div class="w-7 h-7 rounded-lg bg-omni-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3.5 h-3.5 text-omni-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-white font-medium" id="policy2Title">Data Security</p>
+              <p class="text-xs text-slate-500" id="policy2Desc">End-to-end encryption on private servers</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03]">
+            <div class="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-white font-medium" id="policy3Title">Continuous Growth</p>
+              <p class="text-xs text-slate-500" id="policy3Desc">Annual training and certification programs</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03]">
+            <div class="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-white font-medium" id="policy4Title">Performance Reviews</p>
+              <p class="text-xs text-slate-500" id="policy4Desc">Quarterly AI-assisted evaluations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SECTION 4: SALARY REPORT (Hidden by default, shown via command) ====== -->
+  <section id="salaryReportSection" class="mb-10 hidden">
+    <div class="glass-card-strong p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2" id="reportTitle">
+            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Salary Statistics Report
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">Generated by OmniMind AI Core</p>
+        </div>
+        <button onclick="document.getElementById('salaryReportSection').classList.add('hidden')" class="text-slate-500 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="salaryReportContent" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="relative z-10 border-t border-white/5 py-8 no-print">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-omni-500 to-purple-600 flex items-center justify-center">
+        <span class="text-white text-[10px] font-bold">Ω</span>
+      </div>
+      <span>OmniMind Enterprise v3.0 — Private Server Deployment</span>
+    </div>
+    <span id="footerText">© 2026 OmniMind Technologies. All rights reserved. Secure On-Premise Platform.</span>
+  </div>
+</footer>
+
+<!-- ======================== JAVASCRIPT ENGINE ======================== -->
+<script>
+// ============================================================
+//  OmniMind AI Core — Local Simulation Engine
+// ============================================================
+
+// ---- State ----
+let isArabic = false;
+let currentPage = 1;
+const pageSize = 10;
+
+const firstNames = ['Ahmed','Sarah','Omar','Layla','Youssef','Nora','Khaled','Mona','Tariq','Hana','Zain','Reem','Faisal','Dina','Hassan','Lina','Samir','Jasmine','Waleed','Fatima','Ali','Nadia','Rami','Salma','Karim','Amira','Bilal','Sana','Majed','Leila','Adam','Maya','Idris','Aya','Hamza','Dalal','Nassir','Rania','Othman','Mariam'];
+const lastNames = ['Al-Farsi','Mansouri','Khalil','Nasser','Abdallah','Haddad','Saleh','Qasim','Bakri','Taha','Rizk','Sharif','Omari','Jaber','Khoury','Hamdan','Sabbagh','Amin','Darwish','Fares','Barakat','Mustafa','Hariri','Najjar','Zahran','Bishara','Kanaan','Samara','Malki','Rahal'];
+const departments = ['Engineering','Marketing','Finance','Human Resources','Operations','Design','Sales','Legal','Research & Development','IT Security'];
+const titles = {
+  'Engineering': ['Software Engineer','Senior Developer','Tech Lead','DevOps Engineer','Backend Developer','Frontend Developer','Full-Stack Engineer','QA Engineer','Platform Architect','Cloud Engineer'],
+  'Marketing': ['Marketing Manager','Content Strategist','SEO Specialist','Brand Manager','Digital Marketer','Campaign Analyst','Social Media Lead','Growth Hacker'],
+  'Finance': ['Financial Analyst','Accountant','CFO Assistant','Budget Manager','Risk Analyst','Treasury Manager','Audit Specialist','Revenue Analyst'],
+  'Human Resources': ['HR Manager','Recruiter','HR Specialist','Training Coordinator','Payroll Manager','Employee Relations Lead','Talent Acquisition Lead'],
+  'Operations': ['Operations Manager','Project Manager','Supply Chain Lead','Logistics Coordinator','Process Analyst','Facilities Manager'],
+  'Design': ['UI/UX Designer','Product Designer','Graphic Designer','Design Lead','Visual Designer','UX Researcher','Motion Designer'],
+  'Sales': ['Sales Executive','Account Manager','Sales Director','Business Developer','Client Relations Manager','Sales Analyst'],
+  'Legal': ['Legal Counsel','Compliance Officer','Contract Manager','Paralegal','IP Attorney','Regulatory Analyst'],
+  'Research & Development': ['Research Scientist','R&D Engineer','Innovation Lead','Data Scientist','Lab Director','Research Analyst'],
+  'IT Security': ['Security Analyst','CISO Assistant','Penetration Tester','Security Engineer','SOC Analyst','Incident Responder']
+};
+const statuses = ['Active','Active','Active','Active','Active','Away','On Leave','Offline'];
+
+let employees = [];
+let nextId = 1;
+
+// ---- Initialize Sample Data ----
+function initData() {
+  const sampleCount = 25;
+  for (let i = 0; i < sampleCount; i++) {
+    const dept = departments[Math.floor(Math.random() * departments.length)];
+    const titleList = titles[dept] || ['Employee'];
+    employees.push({
+      id: nextId++,
+      name: randomFrom(firstNames) + ' ' + randomFrom(lastNames),
+      department: dept,
+      title: randomFrom(titleList),
+      salary: randomSalary(dept),
+      status: randomFrom(statuses),
+      joined: randomDate()
+    });
+  }
+}
+
+function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function randomSalary(dept) {
+  const base = { 'Engineering':85000,'Marketing':65000,'Finance':75000,'Human Resources':60000,'Operations':62000,'Design':70000,'Sales':68000,'Legal':80000,'Research & Development':90000,'IT Security':88000 };
+  const b = base[dept] || 60000;
+  return b + Math.floor(Math.random() * 40000);
+}
+function randomDate() {
+  const y = 2020 + Math.floor(Math.random() * 7);
+  const m = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+  const d = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+// ---- Rendering ----
+function renderAll() {
+  renderMetrics();
+  renderTable();
+  renderDepartmentList();
+  updateFilterDropdown();
+}
+
+function renderMetrics() {
+  const total = employees.length;
+  const deptSet = new Set(employees.map(e => e.department));
+  const activeCount = employees.filter(e => e.status === 'Active').length;
+  const activeRate = total > 0 ? Math.round((activeCount / total) * 100) : 0;
+  const avgSalary = total > 0 ? Math.round(employees.reduce((s, e) => s + e.salary, 0) / total) : 0;
+
+  animateValue('metricTotalEmp', parseInt(document.getElementById('metricTotalEmp').textContent) || 0, total, 600);
+  animateValue('metricDepts', parseInt(document.getElementById('metricDepts').textContent) || 0, deptSet.size, 600);
+  document.getElementById('metricActiveRate').textContent = activeRate + '%';
+  document.getElementById('metricAvgSalary').textContent = '$' + avgSalary.toLocaleString();
+}
+
+function animateValue(id, start, end, duration) {
+  const el = document.getElementById(id);
+  const range = end - start;
+  if (range === 0) { el.textContent = end; return; }
+  const startTime = performance.now();
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(start + range * eased);
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function getFilteredEmployees() {
+  let list = [...employees];
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const deptFilter = document.getElementById('filterDept').value;
+  if (search) list = list.filter(e => e.name.toLowerCase().includes(search) || e.department.toLowerCase().includes(search) || e.title.toLowerCase().includes(search));
+  if (deptFilter) list = list.filter(e => e.department === deptFilter);
+  return list;
+}
+
+function renderTable() {
+  const filtered = getFilteredEmployees();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * pageSize;
+  const page = filtered.slice(start, start + pageSize);
+
+  const tbody = document.getElementById('employeeTableBody');
+  if (page.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-500">
+      <div class="flex flex-col items-center gap-2">
+        <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+        <span>${isArabic ? 'لا يوجد موظفون. استخدم أمر OmniMind لإضافة موظفين.' : 'No employees found. Use OmniMind commands to add employees.'}</span>
+      </div>
+    </td></tr>`;
+  } else {
+    tbody.innerHTML = page.map((e, i) => `
+      <tr class="animate-fade-in" style="animation-delay:${i * 0.03}s">
+        <td class="font-mono text-xs text-slate-500">#${String(e.id).padStart(4, '0')}</td>
+        <td>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-omni-500/30 to-purple-500/30 flex items-center justify-center text-xs font-bold text-omni-300">
+              ${e.name.split(' ').map(n => n[0]).join('')}
+            </div>
+            <span class="font-medium text-white">${e.name}</span>
+          </div>
+        </td>
+        <td><span class="text-xs bg-white/[0.04] px-2.5 py-1 rounded-lg text-slate-300">${e.department}</span></td>
+        <td class="text-slate-300">${e.title}</td>
+        <td class="font-mono text-slate-300">\$${e.salary.toLocaleString()}</td>
+        <td><span class="badge badge-${e.status.toLowerCase().replace(' ', '')}"><span class="w-1.5 h-1.5 rounded-full ${statusDotColor(e.status)}"></span>${e.status}</span></td>
+        <td class="text-slate-500 text-xs">${e.joined}</td>
+      </tr>
+    `).join('');
+  }
+
+  document.getElementById('tableFooterInfo').textContent = isArabic
+    ? `عرض ${page.length} من ${filtered.length} موظف (الإجمالي: ${employees.length})`
+    : `Showing ${page.length} of ${filtered.length} employees (Total: ${employees.length})`;
+  document.getElementById('pageInfo').textContent = isArabic
+    ? `صفحة ${currentPage} من ${totalPages}`
+    : `Page ${currentPage} of ${totalPages}`;
+  document.getElementById('prevBtn').disabled = currentPage <= 1;
+  document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+}
+
+function statusDotColor(s) {
+  const map = { 'Active':'bg-emerald-400','Away':'bg-amber-400','Offline':'bg-red-400','On Leave':'bg-purple-400' };
+  return map[s] || 'bg-slate-400';
+}
+
+function renderDepartmentList() {
+  const deptMap = {};
+  employees.forEach(e => { deptMap[e.department] = (deptMap[e.department] || 0) + 1; });
+  const sorted = Object.entries(deptMap).sort((a, b) => b[1] - a[1]);
+  const container = document.getElementById('departmentList');
+  const colors = ['from-omni-500/20 to-omni-500/5','from-purple-500/20 to-purple-500/5','from-emerald-500/20 to-emerald-500/5','from-amber-500/20 to-amber-500/5','from-pink-500/20 to-pink-500/5','from-cyan-500/20 to-cyan-500/5','from-red-500/20 to-red-500/5','from-indigo-500/20 to-indigo-500/5','from-teal-500/20 to-teal-500/5','from-orange-500/20 to-orange-500/5'];
+  const textColors = ['text-omni-400','text-purple-400','text-emerald-400','text-amber-400','text-pink-400','text-cyan-400','text-red-400','text-indigo-400','text-teal-400','text-orange-400'];
+
+  if (sorted.length === 0) {
+    container.innerHTML = `<p class="text-sm text-slate-500">${isArabic ? 'لا توجد أقسام بعد' : 'No departments yet'}</p>`;
+    return;
+  }
+
+  container.innerHTML = sorted.map(([dept, count], i) => {
+    const pct = Math.round((count / employees.length) * 100);
+    const c = colors[i % colors.length];
+    const tc = textColors[i % textColors.length];
+    return `
+      <div class="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r ${c}">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full ${tc.replace('text-', 'bg-')}"></span>
+          <span class="text-sm text-white font-medium">${dept}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-16 h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div class="h-full rounded-full ${tc.replace('text-', 'bg-')}" style="width:${pct}%;transition:width 0.5s ease;"></div>
+          </div>
+          <span class="text-xs ${tc} font-semibold">${count}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateFilterDropdown() {
+  const deptSet = new Set(employees.map(e => e.department));
+  const select = document.getElementById('filterDept');
+  const current = select.value;
+  select.innerHTML = `<option value="">${isArabic ? 'جميع الأقسام' : 'All Departments'}</option>` +
+    [...deptSet].sort().map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+}
+
+function filterTable() { currentPage = 1; renderTable(); }
+function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+function nextPage() { const total = Math.ceil(getFilteredEmployees().length / pageSize); if (currentPage < total) { currentPage++; renderTable(); } }
+
+// ---- OmniMind NLP Command Engine ----
+function processCommand() {
+  const input = document.getElementById('commandInput').value.trim();
+  if (!input) return;
+
+  // Show response area
+  const responseArea = document.getElementById('aiResponseArea');
+  responseArea.classList.remove('hidden');
+
+  addLogEntry('⌛ Processing command...', 'processing');
+
+  // Simulate processing delay
+  setTimeout(() => {
+    const result = analyzeCommand(input);
+    clearProcessingLogs();
+    result.messages.forEach((msg, i) => {
+      setTimeout(() => addLogEntry(msg, result.type), i * 150);
+    });
+    renderAll();
+    showToast(result.toast, result.type === 'error' ? 'warning' : 'success');
+    document.getElementById('commandInput').value = '';
+  }, 800 + Math.random() * 600);
+}
+
+function quickCommand(cmd) {
+  document.getElementById('commandInput').value = cmd;
+  processCommand();
+}
+
+function analyzeCommand(input) {
+  const lower = input.toLowerCase();
+
+  // ---- ADD employees ----
+  const addMatch = lower.match(/add\s+(\d+)\s+(.+?)(?:\s+to\s+(?:the\s+)?(.+?)(?:\s+department)?)?$/);
+  if (addMatch || lower.includes('add') || lower.includes('hire') || lower.includes('recruit')) {
+    let count = 1, role = '', dept = '';
+
+    if (addMatch) {
+      count = parseInt(addMatch[1]) || 1;
+      role = addMatch[2].trim();
+      dept = addMatch[3] ? capitalize(addMatch[3].trim()) : guessDepartment(role);
+    } else {
+      const numMatch = lower.match(/(\d+)/);
+      count = numMatch ? parseInt(numMatch[1]) : 1;
+      dept = extractDepartment(lower) || 'Engineering';
+      role = extractRole(lower) || randomFrom(titles[dept] || ['Employee']);
+    }
+
+    if (count > 50) count = 50;
+    dept = matchDepartment(dept);
+
+    const added = [];
+    for (let i = 0; i < count; i++) {
+      const emp = {
+        id: nextId++,
+        name: randomFrom(firstNames) + ' ' + randomFrom(lastNames),
+        department: dept,
+        title: capitalize(role.replace(/s$/, '')),
+        salary: randomSalary(dept),
+        status: 'Active',
+        joined: new Date().toISOString().split('T')[0]
+      };
+      if (titles[dept] && titles[dept].length > 0 && !isValidTitle(emp.title)) {
+        emp.title = randomFrom(titles[dept]);
+      }
+      employees.push(emp);
+      added.push(emp);
+    }
+
+    return {
+      type: 'success',
+      toast: `${count} employee(s) added to ${dept}`,
+      messages: [
+        `✅ OmniMind processed your request successfully.`,
+        `📋 Added ${count} new ${role} to the **${dept}** department.`,
+        ...added.map(e => `   → ${e.name} — ${e.title} ($${e.salary.toLocaleString()})`)
+      ]
+    };
+  }
+
+  // ---- REMOVE / DELETE ----
+  if (lower.includes('remove') || lower.includes('delete') || lower.includes('fire') || lower.includes('terminate')) {
+    const numMatch = lower.match(/(\d+)/);
+    const count = numMatch ? Math.min(parseInt(numMatch[1]), employees.length) : 1;
+    const dept = extractDepartment(lower);
+    let removed = [];
+
+    if (dept) {
+      const deptKey = matchDepartment(dept);
+      const deptEmps = employees.filter(e => e.department === deptKey);
+      const toRemove = deptEmps.slice(0, count);
+      removed = toRemove;
+      employees = employees.filter(e => !toRemove.includes(e));
+    } else {
+      removed = employees.slice(-count);
+      employees = employees.slice(0, -count);
+    }
+
+    return {
+      type: 'success',
+      toast: `${removed.length} employee(s) removed`,
+      messages: [
+        `✅ OmniMind processed removal request.`,
+        `🗑️ Removed ${removed.length} employee(s)${dept ? ' from ' + matchDepartment(dept) : ''}.`,
+        ...removed.map(e => `   → ${e.name} (${e.department})`)
+      ]
+    };
+  }
+
+  // ---- SORT ----
+  if (lower.includes('sort')) {
+    let field = 'name', direction = 'asc';
+    if (lower.includes('salary') || lower.includes('pay')) field = 'salary';
+    else if (lower.includes('department') || lower.includes('dept')) field = 'department';
+    else if (lower.includes('date') || lower.includes('joined') || lower.includes('newest') || lower.includes('oldest')) field = 'joined';
+    else if (lower.includes('title') || lower.includes('role')) field = 'title';
+    else if (lower.includes('status')) field = 'status';
+    else if (lower.includes('id')) field = 'id';
+
+    if (lower.includes('desc') || lower.includes('highest') || lower.includes('newest') || lower.includes('z-a') || lower.includes('reverse')) direction = 'desc';
+
+    employees.sort((a, b) => {
+      let va = a[field], vb = b[field];
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+      if (va < vb) return direction === 'asc' ? -1 : 1;
+      if (va > vb) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return {
+      type: 'success',
+      toast: `Sorted by ${field} (${direction})`,
+      messages: [
+        `✅ Employee directory sorted.`,
+        `🔤 Sorted ${employees.length} employees by **${field}** in **${direction === 'asc' ? 'ascending' : 'descending'}** order.`
+      ]
+    };
+  }
+
+  // ---- REPORT / STATISTICS ----
+  if (lower.includes('report') || lower.includes('statistic') || lower.includes('analytics') || lower.includes('analysis') || lower.includes('summary')) {
+    generateSalaryReport();
+    return {
+      type: 'success',
+      toast: 'Salary report generated',
+      messages: [
+        `✅ OmniMind Intelligence Report generated.`,
+        `📊 Salary statistics calculated across ${new Set(employees.map(e=>e.department)).size} departments.`,
+        `📈 Total payroll: $${employees.reduce((s,e)=>s+e.salary,0).toLocaleString()}/year`,
+        `👥 Covering ${employees.length} employees in the corporate network.`
+      ]
+    };
+  }
+
+  // ---- SHOW / FILTER ----
+  if (lower.includes('show') || lower.includes('filter') || lower.includes('display') || lower.includes('list')) {
+    const dept = extractDepartment(lower);
+    if (lower.includes('active')) {
+      document.getElementById('searchInput').value = '';
+      employees.forEach(e => e._visible = e.status === 'Active');
+      // Use filter dropdown approach
+      const activeEmps = employees.filter(e => e.status === 'Active');
+      return {
+        type: 'success',
+        toast: `Showing ${activeEmps.length} active employees`,
+        messages: [
+          `✅ Filtered to active employees.`,
+          `👥 ${activeEmps.length} of ${employees.length} employees are currently **Active**.`
+        ]
+      };
+    }
+    if (dept) {
+      const deptKey = matchDepartment(dept);
+      document.getElementById('filterDept').value = deptKey;
+      filterTable();
+      const count = employees.filter(e => e.department === deptKey).length;
+      return {
+        type: 'success',
+        toast: `Filtered: ${deptKey}`,
+        messages: [
+          `✅ Directory filtered.`,
+          `🏢 Showing ${count} employees in **${deptKey}** department.`
+        ]
+      };
+    }
+    // Show all
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterDept').value = '';
+    return {
+      type: 'success',
+      toast: 'Showing all employees',
+      messages: [`✅ Showing all ${employees.length} employees.`]
+    };
+  }
+
+  // ---- UPDATE STATUS ----
+  if (lower.includes('set') && lower.includes('status') || lower.includes('mark as') || lower.includes('change status')) {
+    let newStatus = 'Active';
+    if (lower.includes('away')) newStatus = 'Away';
+    else if (lower.includes('offline')) newStatus = 'Offline';
+    else if (lower.includes('leave')) newStatus = 'On Leave';
+
+    const dept = extractDepartment(lower);
+    let affected = employees;
+    if (dept) {
+      const deptKey = matchDepartment(dept);
+      affected = employees.filter(e => e.department === deptKey);
+    }
+
+    affected.forEach(e => e.status = newStatus);
+    return {
+      type: 'success',
+      toast: `Status updated to ${newStatus}`,
+      messages: [
+        `✅ Status update applied.`,
+        `🔄 Set ${affected.length} employees to **${newStatus}**${dept ? ' in ' + matchDepartment(dept) : ''}.`
+      ]
+    };
+  }
+
+  // ---- RAISE / SALARY INCREASE ----
+  if (lower.includes('raise') || lower.includes('increase salary') || lower.includes('bonus') || lower.includes('salary increase')) {
+    const pctMatch = lower.match(/(\d+)\s*%/);
+    const pct = pctMatch ? parseInt(pctMatch[1]) : 10;
+    const dept = extractDepartment(lower);
+    let affected = employees;
+    if (dept) {
+      const deptKey = matchDepartment(dept);
+      affected = employees.filter(e => e.department === deptKey);
+    }
+    affected.forEach(e => e.salary = Math.round(e.salary * (1 + pct / 100)));
+    return {
+      type: 'success',
+      toast: `${pct}% raise applied`,
+      messages: [
+        `✅ Salary adjustment processed.`,
+        `💰 Applied a **${pct}% raise** to ${affected.length} employees${dept ? ' in ' + matchDepartment(dept) : ''}.`,
+        `📈 New average salary: $${Math.round(affected.reduce((s,e)=>s+e.salary,0) / affected.length).toLocaleString()}`
+      ]
+    };
+  }
+
+  // ---- RESET / CLEAR ----
+  if (lower.includes('reset') || lower.includes('clear all') || lower.includes('wipe')) {
+    const oldCount = employees.length;
+    employees = [];
+    nextId = 1;
+    return {
+      type: 'success',
+      toast: 'Data reset',
+      messages: [
+        `✅ OmniMind data reset completed.`,
+        `🗑️ Removed all ${oldCount} employee records.`,
+        `📋 System ready for new data entry.`
+      ]
+    };
+  }
+
+  // ---- DEPARTMENT CREATION ----
+  if (lower.includes('create department') || lower.includes('new department') || lower.includes('add department')) {
+    const deptMatch = input.match(/(?:create|new|add)\s+(?:a\s+)?(?:department|dept)\s+(?:called|named)?\s*[:\-]?\s*(.+)/i);
+    if (deptMatch) {
+      const newDept = capitalize(deptMatch[1].trim().replace(/department$/i, '').trim());
+      if (!titles[newDept]) titles[newDept] = ['Manager', 'Specialist', 'Coordinator', 'Analyst', 'Director'];
+      if (!departments.includes(newDept)) departments.push(newDept);
+      return {
+        type: 'success',
+        toast: `Department "${newDept}" created`,
+        messages: [`✅ New department **${newDept}** has been created in the organizational structure.`]
+      };
+    }
+  }
+
+  // ---- HELP ----
+  if (lower.includes('help') || lower === '?') {
+    return {
+      type: 'info',
+      toast: 'Help guide displayed',
+      messages: [
+        `📘 **OmniMind Command Guide:**`,
+        `   • "Add [N] [role] to [department]" — Add employees`,
+        `   • "Remove [N] employees from [dept]" — Remove employees`,
+        `   • "Sort by [field]" — Sort directory (name, salary, dept, date)`,
+        `   • "Generate salary report" — Show salary analytics`,
+        `   • "Show active employees" — Filter by status`,
+        `   • "Give [N]% raise to [dept]" — Adjust salaries`,
+        `   • "Set status to [status]" — Update employee status`,
+        `   • "Reset" — Clear all data`,
+        `   • "Help" — Show this guide`
+      ]
+    };
+  }
+
+  // ---- Fallback: Try to interpret loosely ----
+  // Check if they mentioned a department
+  const dept = extractDepartment(lower);
+  const numMatch = lower.match(/(\d+)/);
+  if (numMatch && dept) {
+    // Assume add
+    const count = Math.min(parseInt(numMatch[1]), 50);
+    const deptKey = matchDepartment(dept);
+    for (let i = 0; i < count; i++) {
+      employees.push({
+        id: nextId++,
+        name: randomFrom(firstNames) + ' ' + randomFrom(lastNames),
+        department: deptKey,
+        title: randomFrom(titles[deptKey] || ['Employee']),
+        salary: randomSalary(deptKey),
+        status: 'Active',
+        joined: new Date().toISOString().split('T')[0]
+      });
+    }
+    return {
+      type: 'success',
+      toast: `${count} employees added to ${deptKey}`,
+      messages: [
+        `🧠 OmniMind interpreted your command as: **Add ${count} employees to ${deptKey}**.`,
+        `✅ ${count} new employees have been added.`
+      ]
+    };
+  }
+
+  return {
+    type: 'error',
+    toast: 'Command not recognized',
+    messages: [
+      `⚠️ OmniMind couldn't fully interpret this command.`,
+      `💡 Try commands like: "Add 5 engineers to Engineering", "Sort by salary", "Generate report"`,
+      `📘 Type "help" for the full command guide.`
+    ]
+  };
+}
+
+// ---- Helper NLP Functions ----
+function extractDepartment(text) {
+  const deptKeywords = {
+    'engineering': 'Engineering', 'tech': 'Engineering', 'technology': 'Engineering', 'software': 'Engineering', 'dev': 'Engineering',
+    'marketing': 'Marketing', 'brand': 'Marketing', 'market': 'Marketing',
+    'finance': 'Finance', 'financial': 'Finance', 'accounting': 'Finance',
+    'hr': 'Human Resources', 'human resources': 'Human Resources', 'human resource': 'Human Resources', 'people': 'Human Resources',
+    'operations': 'Operations', 'ops': 'Operations', 'logistics': 'Operations',
+    'design': 'Design', 'ui': 'Design', 'ux': 'Design', 'creative': 'Design',
+    'sales': 'Sales', 'business development': 'Sales', 'revenue': 'Sales',
+    'legal': 'Legal', 'compliance': 'Legal', 'law': 'Legal',
+    'research': 'Research & Development', 'r&d': 'Research & Development', 'rd': 'Research & Development', 'innovation': 'Research & Development',
+    'security': 'IT Security', 'it security': 'IT Security', 'cyber': 'IT Security', 'infosec': 'IT Security',
+  };
+  for (const [key, val] of Object.entries(deptKeywords)) {
+    if (text.includes(key)) return val;
+  }
+  return '';
+}
+
+function guessDepartment(role) {
+  const r = role.toLowerCase();
+  if (/engineer|developer|devops|backend|frontend|full.?stack|qa|architect|cloud|software/i.test(r)) return 'Engineering';
+  if (/market|seo|brand|content|campaign|social/i.test(r)) return 'Marketing';
+  if (/financ|account|budget|audit|treasury|revenue/i.test(r)) return 'Finance';
+  if (/hr|recruit|payroll|talent|training/i.test(r)) return 'Human Resources';
+  if (/operat|project|supply|logistics|facilit/i.test(r)) return 'Operations';
+  if (/design|ui|ux|graphic|visual|motion/i.test(r)) return 'Design';
+  if (/sale|account manager|business dev|client/i.test(r)) return 'Sales';
+  if (/legal|counsel|compliance|contract|attorney|paralegal/i.test(r)) return 'Legal';
+  if (/research|scientist|data|lab|innovat/i.test(r)) return 'Research & Development';
+  if (/security|ciso|penetrat|soc|incident/i.test(r)) return 'IT Security';
+  return 'Engineering';
+}
+
+function matchDepartment(input) {
+  const exact = departments.find(d => d.toLowerCase() === input.toLowerCase());
+  if (exact) return exact;
+  const partial = departments.find(d => d.toLowerCase().includes(input.toLowerCase()));
+  if (partial) return partial;
+  // Create new if valid
+  const cap = capitalize(input);
+  if (!departments.includes(cap)) {
+    departments.push(cap);
+    titles[cap] = ['Manager', 'Specialist', 'Coordinator', 'Analyst', 'Director'];
+  }
+  return cap;
+}
+
+function extractRole(text) {
+  const roles = ['engineer','developer','designer','manager','analyst','specialist','coordinator','director','lead','architect','scientist','recruiter','accountant','counsel','officer'];
+  for (const r of roles) {
+    if (text.includes(r)) return capitalize(r);
+  }
+  return '';
+}
+
+function isValidTitle(t) {
+  return t && t.length > 2 && !/^\d+$/.test(t) && !/^(to|the|a|an|and|or)$/i.test(t);
+}
+
+function capitalize(str) {
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// ---- Salary Report ----
+function generateSalaryReport() {
+  const section = document.getElementById('salaryReportSection');
+  section.classList.remove('hidden');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const container = document.getElementById('salaryReportContent');
+  const deptMap = {};
+  employees.forEach(e => {
+    if (!deptMap[e.department]) deptMap[e.department] = [];
+    deptMap[e.department].push(e.salary);
+  });
+
+  const cards = Object.entries(deptMap).sort((a,b) => b[1].length - a[1].length).map(([dept, salaries]) => {
+    const min = Math.min(...salaries);
+    const max = Math.max(...salaries);
+    const avg = Math.round(salaries.reduce((a,b) => a+b, 0) / salaries.length);
+    const total = salaries.reduce((a,b) => a+b, 0);
+    return `
+      <div class="glass-card p-5 animate-scale-in">
+        <h4 class="text-sm font-bold text-white mb-3">${dept}</h4>
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between"><span class="text-slate-400">Headcount</span><span class="text-white font-semibold">${salaries.length}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Avg Salary</span><span class="text-emerald-400 font-semibold">\$${avg.toLocaleString()}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Min</span><span class="text-slate-300">\$${min.toLocaleString()}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Max</span><span class="text-slate-300">\$${max.toLocaleString()}</span></div>
+          <div class="flex justify-between border-t border-white/5 pt-2 mt-2"><span class="text-slate-400">Total Payroll</span><span class="text-omni-400 font-bold">\$${total.toLocaleString()}</span></div>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = cards.join('');
+}
+
+// ---- Log Management ----
+function addLogEntry(message, type = 'info') {
+  const log = document.getElementById('aiResponseLog');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry text-sm';
+  message = message.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
+  entry.innerHTML = `<span class="${type === 'processing' ? 'text-omni-400' : type === 'error' ? 'text-amber-400' : 'text-slate-300'}">${message}</span>`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function clearProcessingLogs() {
+  const log = document.getElementById('aiResponseLog');
+  const entries = log.querySelectorAll('.log-entry');
+  entries.forEach(e => {
+    if (e.textContent.includes('Processing')) e.remove();
+  });
+}
+
+// ---- Toasts ----
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-bold text-omni-400">Ω</span>
+      <span>${message}</span>
+    </div>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-10px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// ---- Language Toggle ----
+function toggleLanguage() {
+  isArabic = !isArabic;
+  const html = document.documentElement;
+
+  if (isArabic) {
+    html.setAttribute('dir', 'rtl');
+    html.setAttribute('lang', 'ar');
+    document.body.style.fontFamily = "'Cairo', sans-serif";
+
+    // Translate UI elements
+    document.getElementById('navSubtitle').textContent = 'ذكاء المؤسسات';
+    document.getElementById('serverStatusText').textContent = 'متصل بالخادم الخاص';
+    document.getElementById('mobileServerStatus').textContent = 'متصل بالخادم الخاص';
+    document.getElementById('langToggleLabel').textContent = 'English';
+    document.getElementById('sectionLabel1').textContent = 'نواة OmniMind الذكية';
+    document.getElementById('heroTitle').textContent = 'تحكّم بمؤسستك';
+    document.getElementById('heroSubtitle').textContent = 'اكتب أوامر بلغة طبيعية لإدارة الموظفين وإنشاء التقارير وتنسيق ذكاء الشركة في الوقت الفعلي.';
+    document.getElementById('commandLabel').textContent = 'موجه أوامر OmniMind';
+    document.getElementById('commandInput').placeholder = 'مثال: أضف 3 مهندسين برمجيات إلى قسم التقنية...';
+    document.getElementById('cmdBtnText').textContent = 'تنفيذ';
+    document.getElementById('quickLabel').textContent = 'سريع:';
+    document.getElementById('aiResponseLabel').textContent = 'رد OmniMind';
+    document.getElementById('metricTotalLabel').textContent = 'إجمالي الموظفين';
+    document.getElementById('metricDeptLabel').textContent = 'الأقسام';
+    document.getElementById('metricActiveLabel').textContent = 'نسبة النشاط';
+    document.getElementById('metricSalaryLabel').textContent = 'متوسط الراتب';
+    document.getElementById('directoryTitle').innerHTML = '<svg class="w-5 h-5 text-omni-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg> دليل الموظفين المباشر';
+    document.getElementById('directorySubtitle').textContent = 'سجل شبكة الشركة في الوقت الفعلي بإدارة OmniMind';
+    document.getElementById('searchInput').placeholder = 'بحث عن موظفين...';
+    document.getElementById('thId').textContent = 'الرقم';
+    document.getElementById('thName').textContent = 'اسم الموظف';
+    document.getElementById('thDept').textContent = 'القسم';
+    document.getElementById('thTitle').textContent = 'المسمى الوظيفي';
+    document.getElementById('thSalary').textContent = 'الراتب';
+    document.getElementById('thStatus').textContent = 'الحالة';
+    document.getElementById('thJoined').textContent = 'تاريخ الانضمام';
+    document.getElementById('prevBtn').textContent = '→ السابق';
+    document.getElementById('nextBtn').textContent = 'التالي ←';
+    document.getElementById('sectionLabel3').textContent = 'مركز ذكاء الشركة';
+    document.getElementById('intelTitle').textContent = 'الذكاء المؤسسي والحوكمة';
+    document.getElementById('intelSubtitle').textContent = 'الرؤية والأقسام والسياسات بإدارة نواة OmniMind';
+    document.getElementById('visionCardTitle').textContent = 'رؤية الشركة';
+    document.getElementById('visionCardSub').textContent = 'التوجه الاستراتيجي';
+    document.getElementById('visionText').textContent = 'تمكين المؤسسات بالذكاء الاصطناعي، وتحويل طريقة إدارة رأس المال البشري واتخاذ القرارات الاستراتيجية وتحقيق التميز التشغيلي من خلال منصة OmniMind.';
+    document.getElementById('deptCardTitle').textContent = 'الأقسام';
+    document.getElementById('deptCardSub').textContent = 'الهيكل التنظيمي';
+    document.getElementById('policyCardTitle').textContent = 'سياسات العمل';
+    document.getElementById('policyCardSub').textContent = 'إطار الحوكمة';
+    document.getElementById('policy1Title').textContent = 'نموذج العمل المرن';
+    document.getElementById('policy1Desc').textContent = 'جدولة مرنة عن بُعد وفي المكتب';
+    document.getElementById('policy2Title').textContent = 'أمن البيانات';
+    document.getElementById('policy2Desc').textContent = 'تشفير شامل على الخوادم الخاصة';
+    document.getElementById('policy3Title').textContent = 'النمو المستمر';
+    document.getElementById('policy3Desc').textContent = 'برامج تدريب وشهادات سنوية';
+    document.getElementById('policy4Title').textContent = 'تقييم الأداء';
+    document.getElementById('policy4Desc').textContent = 'تقييمات ربع سنوية بمساعدة الذكاء الاصطناعي';
+    document.getElementById('footerText').textContent = '© 2026 OmniMind Technologies. جميع الحقوق محفوظة. منصة آمنة داخل المؤسسة.';
+  } else {
+    html.setAttribute('dir', 'ltr');
+    html.setAttribute('lang', 'en');
+    document.body.style.fontFamily = "'Inter', sans-serif";
+
+    document.getElementById('navSubtitle').textContent = 'Enterprise Intelligence';
+    document.getElementById('serverStatusText').textContent = 'Private Server Connected';
+    document.getElementById('mobileServerStatus').textContent = 'Private Server Connected';
+    document.getElementById('langToggleLabel').textContent = 'عربي';
+    document.getElementById('sectionLabel1').textContent = 'OmniMind AI Core';
+    document.getElementById('heroTitle').textContent = 'Command Your Enterprise';
+    document.getElementById('heroSubtitle').textContent = 'Type natural language commands to manage employees, generate reports, and orchestrate your corporate intelligence in real-time.';
+    document.getElementById('commandLabel').textContent = 'OmniMind Command Prompt';
+    document.getElementById('commandInput').placeholder = 'e.g. Add 3 software engineers to tech department...';
+    document.getElementById('cmdBtnText').textContent = 'Execute';
+    document.getElementById('quickLabel').textContent = 'Quick:';
+    document.getElementById('aiResponseLabel').textContent = 'OmniMind Response';
+    document.getElementById('metricTotalLabel').textContent = 'Total Employees';
+    document.getElementById('metricDeptLabel').textContent = 'Departments';
+    document.getElementById('metricActiveLabel').textContent = 'Active Rate';
+    document.getElementById('metricSalaryLabel').textContent = 'Avg. Salary';
+    document.getElementById('directoryTitle').innerHTML = '<svg class="w-5 h-5 text-omni-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg> Live Employee Directory';
+    document.getElementById('directorySubtitle').textContent = 'Real-time corporate network registry managed by OmniMind';
+    document.getElementById('searchInput').placeholder = 'Search employees...';
+    document.getElementById('thId').textContent = 'ID';
+    document.getElementById('thName').textContent = 'Employee Name';
+    document.getElementById('thDept').textContent = 'Department';
+    document.getElementById('thTitle').textContent = 'Title';
+    document.getElementById('thSalary').textContent = 'Salary';
+    document.getElementById('thStatus').textContent = 'Status';
+    document.getElementById('thJoined').textContent = 'Joined';
+    document.getElementById('prevBtn').textContent = '← Prev';
+    document.getElementById('nextBtn').textContent = 'Next →';
+    document.getElementById('sectionLabel3').textContent = 'Company Intelligence Hub';
+    document.getElementById('intelTitle').textContent = 'Corporate Intelligence & Governance';
+    document.getElementById('intelSubtitle').textContent = 'Vision, departments, and policies orchestrated by OmniMind Core';
+    document.getElementById('visionCardTitle').textContent = 'Company Vision';
+    document.getElementById('visionCardSub').textContent = 'Strategic Direction';
+    document.getElementById('visionText').textContent = 'To empower enterprises with AI-driven intelligence, transforming how organizations manage human capital, make strategic decisions, and achieve operational excellence through the OmniMind platform.';
+    document.getElementById('deptCardTitle').textContent = 'Departments';
+    document.getElementById('deptCardSub').textContent = 'Organizational Structure';
+    document.getElementById('policyCardTitle').textContent = 'Work Policies';
+    document.getElementById('policyCardSub').textContent = 'Governance Framework';
+    document.getElementById('policy1Title').textContent = 'Hybrid Work Model';
+    document.getElementById('policy1Desc').textContent = 'Flexible remote and on-site scheduling';
+    document.getElementById('policy2Title').textContent = 'Data Security';
+    document.getElementById('policy2Desc').textContent = 'End-to-end encryption on private servers';
+    document.getElementById('policy3Title').textContent = 'Continuous Growth';
+    document.getElementById('policy3Desc').textContent = 'Annual training and certification programs';
+    document.getElementById('policy4Title').textContent = 'Performance Reviews';
+    document.getElementById('policy4Desc').textContent = 'Quarterly AI-assisted evaluations';
+    document.getElementById('footerText').textContent = '© 2026 OmniMind Technologies. All rights reserved. Secure On-Premise Platform.';
+  }
+
+  renderTable();
+  updateFilterDropdown();
+}
+
+// ---- Mobile Menu ----
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ---- Live Clock ----
+function updateClock() {
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const date = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const str = `${date} • ${time}`;
+  const el = document.getElementById('liveTime');
+  const mel = document.getElementById('mobileTime');
+  if (el) el.textContent = str;
+  if (mel) mel.textContent = str;
+}
+
+// ---- Initialization ----
+document.addEventListener('DOMContentLoaded', () => {
+  initData();
+  renderAll();
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Startup toast
+  setTimeout(() => {
+    showToast('OmniMind Core initialized. Private server connection established.', 'info');
+  }, 500);
+
+  // Animate metric change indicator
+  const prevTotal = 0;
+  const newTotal = employees.length;
+  if (newTotal > prevTotal) {
+    document.getElementById('empChangeIndicator').textContent = `+${newTotal}`;
+  }
+});
+</script>
+</body>
+</html>
